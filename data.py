@@ -12,6 +12,12 @@ class Document:
     def update_knn(self, knn):
         self.knn = knn
 
+    def __str__(self):
+        return "Document(id=%d, attributes=[%s], rel_score=%.3f, knn=[%s])" % (self.id,
+                                                                              ", ".join(map(str, self.attributes)),
+                                                                              self.rel_score,
+                                                                              ", ".join(map(str, self.knn)))
+
 
 def jaccard_similarity(a: Document, b: Document):
     a_set = set(a.attributes)
@@ -28,6 +34,7 @@ def get_fake_candidates():
     knn's are calculated by jaccard sim with attributes
     :return:
     """
+    random.seed(0)  # to give static data
     docs = []
     for i in range(100):
         id = i
@@ -36,6 +43,8 @@ def get_fake_candidates():
             rand_attr = random.randint(0, 40)
             if rand_attr <= 20:
                 attr.append(rand_attr)
+        if len(attr) == 0:
+            attr.append(random.randint(0, 20))
 
         rel_score = random.random()
 
@@ -50,10 +59,16 @@ def get_fake_candidates():
                 sim_mat[i, j] = sim_mat[j, i]
             else:
                 sim_mat[i, j] = jaccard_similarity(docs[i], docs[j])
-
+    print(sim_mat)
     for i in range(100):
-        knn = np.argsort(sim_mat)[:6].tolist()
-        knn = list(filter(lambda: id != i, knn))
+        knn = np.argsort(sim_mat[i])[::-1][:6].tolist()
+        knn = list(filter(lambda id: id != i, knn))
         docs[i].update_knn(knn[:5])
 
     return docs
+
+
+if __name__ == "__main__":
+    docs = get_fake_candidates()
+    for doc in docs:
+        print(doc)
