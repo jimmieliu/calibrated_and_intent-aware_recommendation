@@ -18,6 +18,7 @@ class Document:
         self.knn: List[int] = knn
         self.subprofile = subprofile
         self.feature_vec = feature_vec
+        self.w_u_i = 1.
 
     def update_knn(self, knn):
         self.knn = knn
@@ -52,7 +53,7 @@ def get_fake_docs(N=100, num_genres=20):
 
         docs.append(Document(id, attr, rel_score))
 
-    update_knn_by_jaccard_sim(docs, k=20)
+    update_knn_by_jaccard_sim(docs, k=5)
 
     return docs
 
@@ -94,7 +95,7 @@ def get_session(K=100, N=100):
     :param N:
     :return:
     """
-    docs = get_fake_docs(K + N + 500)
+    docs = get_fake_docs(K + N + 1000)
     RS = docs[:K]
     I_u = docs[K:]
     return RS, I_u
